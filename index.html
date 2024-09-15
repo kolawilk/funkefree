@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WAZ Teaser Übersicht</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .teaser {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 10px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+        .teaser img {
+            width: 100px;
+            height: auto;
+            margin-right: 15px;
+        }
+        .teaser-content {
+            max-width: 500px;
+        }
+        .teaser-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .teaser-subtitle {
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+<h1>WAZ Teaser Übersicht</h1>
+<div id="teaser-container"></div>
+
+<script>
+    // Funktion zum Abrufen der Daten
+    async function fetchTeaserData() {
+        try {
+            const response = await fetch('https://app-webview.sparknews.funkemedien.de/nrw-waz/');
+            const data = await response.json();
+            
+            // Render-Teaser Funktion aufrufen
+            renderTeasers(data.components);
+        } catch (error) {
+            console.error('Fehler beim Abrufen der Daten:', error);
+        }
+    }
+
+    // Funktion, die Teaser in HTML-DOM einfügt
+    function renderTeasers(components) {
+        const teaserContainer = document.getElementById('teaser-container');
+        
+        components.forEach(component => {
+            if (component.type === "TEASER_SLIDER") {
+                component.teasers.forEach(teaser => {
+                    // Erstellen eines Div-Elements für jeden Teaser
+                    const teaserElement = document.createElement('div');
+                    teaserElement.classList.add('teaser');
+                    
+                    // Teaser-Bild
+                    const teaserImage = document.createElement('img');
+                    teaserImage.src = `https://app-webview.sparknews.funkemedien.de/nrw-waz/assets/${teaser.teaserImage.imgBase}16x9.png`;
+                    teaserElement.appendChild(teaserImage);
+                    
+                    // Teaser-Inhalt
+                    const teaserContent = document.createElement('div');
+                    teaserContent.classList.add('teaser-content');
+                    
+                    const teaserTitle = document.createElement('div');
+                    teaserTitle.classList.add('teaser-title');
+                    teaserTitle.innerText = teaser.teaserTitle;
+                    teaserContent.appendChild(teaserTitle);
+                    
+                    const teaserSubtitle = document.createElement('div');
+                    teaserSubtitle.classList.add('teaser-subtitle');
+                    teaserSubtitle.innerText = teaser.teaserSubtitle;
+                    teaserContent.appendChild(teaserSubtitle);
+                    
+                    const teaserIntro = document.createElement('div');
+                    teaserIntro.innerText = teaser.teaserIntro;
+                    teaserContent.appendChild(teaserIntro);
+                    
+                    teaserElement.appendChild(teaserContent);
+                    teaserContainer.appendChild(teaserElement);
+                });
+            }
+        });
+    }
+
+    // Funktion aufrufen, um Daten abzurufen und darzustellen
+    fetchTeaserData();
+</script>
+
+</body>
+</html>
